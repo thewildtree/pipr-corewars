@@ -1,7 +1,7 @@
-from exceptions import ParserException
 from typing import List
 import re
-from redcode import Instruction, Modifier, OpCode, AddressingMode, Warrior
+from .redcode import Instruction, Modifier, OpCode, AddressingMode, Warrior
+from .exceptions import ParserException
 
 
 
@@ -28,7 +28,7 @@ class Parser():
 
 
     @staticmethod
-    def parse_instruction(line: str, index: int) -> Instruction:
+    def parse_instruction(line: str, index: int = 0) -> Instruction:
         # temporary - uppercase everything
         line = line.upper()
         # instruction regex - pretty basic, but works fine
