@@ -30,7 +30,20 @@ def test_instruction_default_modifier():
     assert_parsed_correctly(line, desired_instruction)
 
 
-def test_instruction_default_mode():
+def test_instruction_default_mode_one():
+    line = 'DIV.x }8, -9'
+    desired_instruction = Instruction(
+        OpCode.DIV,
+        Modifier.X,
+        8,
+        AddressingMode('}'),
+        -9,
+        AddressingMode('$')
+    )
+    assert_parsed_correctly(line, desired_instruction)
+
+
+def test_instruction_default_mode_both():
     line = 'SUB.x -5, -3'
     desired_instruction = Instruction(
         OpCode.SUB,
