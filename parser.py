@@ -39,11 +39,6 @@ class Parser():
                         raise ParserException(i, line, 'Invalid OpCode')
                     else:
                         op_code = OpCode[op_code]
-                    # modifier
-                    if modifier is not None and modifier not in Modifier.keys():
-                        raise ParserException(i, line, 'Invalid modifier')
-                    else:
-                        modifier = Modifier[modifier]
                     # operand values
                     if not a_value:
                         raise ParserException(i, line, 'A operand value not specified')
@@ -63,6 +58,14 @@ class Parser():
                     a_mode = AddressingMode(a_mode) if a_mode else default_mode
                     b_mode = AddressingMode(b_mode) if b_mode else default_mode
 
+                    # modifier at the end because we need addressing modes to determine the default one
+                    if modifier is not None and modifier not in Modifier.keys():
+                        raise ParserException(i, line, 'Invalid modifier')
+                    elif not modifier:
+                        modifier = Parser.get_default_modifier(op_code, a_mode, b_mode)
+                    else:
+                        modifier = Modifier[modifier]
+
                     warrior.instructions.append(Instruction(
                         op_code=op_code,
                         modifier=modifier,
@@ -75,7 +78,7 @@ class Parser():
                 elif line:
                     raise ParserException(i, line, 'Expected a comment or a instruction but none found')
         return warrior
-                
+
 
     @staticmethod
     def get_default_modifier(
