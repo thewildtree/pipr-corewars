@@ -1,7 +1,15 @@
+from dataclasses import dataclass
 from enum import Enum
+from typing import List
 
 
-class OpCode(Enum):
+class ExtendedEnum(Enum):
+    @classmethod
+    def keys(cls):
+        return list(map(lambda c: c.name, cls))
+
+
+class OpCode(ExtendedEnum):
     DAT = 0
     MOV = 1
     ADD = 2
@@ -21,7 +29,7 @@ class OpCode(Enum):
     NOP = 16
 
 
-class Modifier(Enum):
+class Modifier(ExtendedEnum):
     A = 0
     B = 1
     AB = 2
@@ -40,3 +48,19 @@ class AddressingMode(Enum):
     A_POSTDEC_IND = '}'
     B_PREDEC_IND = '<'
     B_POSTDEC_IND = '>'
+
+
+@dataclass
+class Instruction():
+    op_code: OpCode
+    modifier: Modifier
+    a_value: int
+    a_mode: AddressingMode
+    b_value: int
+    b_mode: AddressingMode
+
+
+@dataclass
+class Warrior():
+    name: str
+    instructions: List[Instruction]
