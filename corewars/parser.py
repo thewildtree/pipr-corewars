@@ -58,6 +58,11 @@ class Parser():
         if not b_value:
             if op_code not in [OpCode.DAT, OpCode.JMP, OpCode.SPL, OpCode.NOP]:
                 raise ParserException(index, line, 'B operand value required but not found')
+            elif op_code == OpCode.DAT:
+                # "One unusual thing about DAT, a relic of the previous standards, is that if it has only one argument it's placed in the B-field."
+                b_value = a_value
+                b_mode = a_mode
+                a_value = a_mode = None
             else:
                 b_value = 0
         else:
