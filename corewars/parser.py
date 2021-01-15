@@ -42,8 +42,6 @@ class Parser():
             raise ParserException(index, line, 'Expected a comment or a instruction but none found')
 
         op_code, modifier, a_mode, a_value, b_mode, b_value = match.groups()
-        # remove potential comments from the last group (regex problem described above)
-        b_value = b_value.split()[0]
         # opcode
         if op_code not in OpCode.keys():
             raise ParserException(index, line, 'Invalid OpCode')
@@ -53,6 +51,9 @@ class Parser():
         if not a_value:
             raise ParserException(index, line, 'A operand value not specified')
         else:
+            # if the b field is not present, we might have a comment 'caught' in the a_value group
+            if not b_value:
+                a_value = a_value.split()[0]
             a_value = int(a_value)
         # only the DAT, JMP, SPL and NOP opcodes can work without the B operand specified
         if not b_value:
@@ -66,7 +67,8 @@ class Parser():
             else:
                 b_value = 0
         else:
-            b_value = int(b_value)
+            # remove potential comments from the last group (regex problem described above)
+            b_value = int(b_value.split()[0])
 
         # if no addressing mode specified, default is $ (direct) except for DAT opcode - in that case it's # (immediate)
         default_mode = AddressingMode.DIRECT if op_code != OpCode.DAT else AddressingMode.IMMEDIATE
