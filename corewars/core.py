@@ -11,20 +11,42 @@ class Core():
     def __init__(self, size=8000):
         self._size = size
         self._instructions: List[CoreInstruction]
-        self._warriors: List[CoreWarrior] = []
+        self.warriors: List[CoreWarrior]
         self.clear()
+
+
+    def __getitem__(self, key):
+        return self._instructions[key % self._size]
+
+ 
+    def __setitem__(self, key, value):
+        self._instructions[key % self._size] = value
+
+
+    def __iter__(self):
+        return iter(self._instructions)
 
 
     def clear(self, default_instruction=default_dat()):
         self._instructions = [CoreInstruction(self, default_instruction) * self._size]
+        self.warriors = []
 
-  
+
     def load_warrior(self, warrior: Warrior, address: int):
         """
         Loads all instructions of the given Warrior into the Core
         starting at the given address.
         """
-        pass
+        if not address:
+            # TODO: automatically determine the default address
+            address = 2137
+        # create initial process for the given warrior
+        core_warrior = CoreWarrior(self, warrior.name, address)
+        self.warriors.append(core_warrior)
+        # load warrior's instructions into core
+        for i, instruction in enumerate(warrior.instructions):
+            core_instruction = CoreInstruction(self, instruction)
+            self[address + i] = core_instruction
 
 
     def normalize_value(self, value: int) -> int:
