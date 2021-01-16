@@ -1,17 +1,22 @@
 from dataclasses import field
 from typing import List
-from corewars.redcode import Instruction, OpCode, Warrior
+from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode, Warrior
+
+
+def default_dat():
+    return Instruction(OpCode.DAT, Modifier.F, 0, AddressingMode('$'), 0, AddressingMode('$'))
 
 
 class Core():
     def __init__(self, size=8000):
         self._size = size
-        self._instructions: List[CoreInstruction] = []
+        self._instructions: List[CoreInstruction]
         self._warriors: List[CoreWarrior] = []
+        self.clear()
 
-  
-    def clear(self, default_instruction = OpCode.DAT):
-        self._instructions = []
+
+    def clear(self, default_instruction=default_dat()):
+        self._instructions = [CoreInstruction(self, default_instruction) * self._size]
 
   
     def load_warrior(self, warrior: Warrior, address: int):
