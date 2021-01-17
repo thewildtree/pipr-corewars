@@ -59,7 +59,7 @@ class Core():
         else:
             return self._instructions[key % self._size]
 
- 
+
     def __setitem__(self, key, value):
         self._instructions[key % self._size] = value
 
