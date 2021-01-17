@@ -108,9 +108,10 @@ class CoreWarrior():
         self.name = name
         self._core = core
         self._current_process = 0
+        self._processes: List[int] = []
         # a list of integers - each one is an instruction pointer for one process
         # pointers contain absolute Core memory addresses.
-        self._processes = [initial_address]
+        self.add_process(initial_address)
 
 
     def turn_next(self):
@@ -122,7 +123,7 @@ class CoreWarrior():
         Creates a new process with its pointer set to the given address.
         It is then added to the last position of the queue.
         """
-        self._processes.append(starting_address)
+        self._processes.append(self._core.normalize_value(starting_address))
 
 
     def kill_current(self):
