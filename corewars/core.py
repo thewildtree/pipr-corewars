@@ -28,7 +28,9 @@ class Core():
 
 
     def clear(self, default_instruction=default_dat()):
-        self._instructions = [CoreInstruction(self, default_instruction)] * self._size
+        self._instructions = []
+        for _ in range(self._size):
+            self._instructions.append(CoreInstruction(self, default_instruction))
         self.warriors = []
 
 
