@@ -15,18 +15,6 @@ class Core():
         self.clear()
 
 
-    def __getitem__(self, key):
-        return self._instructions[key % self._size]
-
- 
-    def __setitem__(self, key, value):
-        self._instructions[key % self._size] = value
-
-
-    def __iter__(self):
-        return iter(self._instructions)
-
-
     def clear(self, default_instruction=default_dat()):
         self._instructions = []
         for _ in range(self._size):
@@ -58,6 +46,26 @@ class Core():
         while value < 0:
             value += self._size
         return value
+
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            start = 0 if key.start is None else key.start
+            stop = self._size if key.stop is None else key.stop
+            if start > stop:
+                return self._instructions[start:] + self._instructions[:stop]
+            else:
+                return self._instructions[start:stop]
+        else:
+            return self._instructions[key % self._size]
+
+ 
+    def __setitem__(self, key, value):
+        self._instructions[key % self._size] = value
+
+
+    def __iter__(self):
+        return iter(self._instructions)
 
 
 class CoreInstruction(Instruction):
