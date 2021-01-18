@@ -29,9 +29,6 @@ class Core():
         Loads all instructions of the given Warrior into the Core
         starting at the given address.
         """
-        if address is None:
-            # TODO: automatically determine the default address
-            address = 2137
         # create initial process for the given warrior
         core_warrior = CoreWarrior(self, warrior.name, address)
         self._warriors.append(core_warrior)
