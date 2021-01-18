@@ -21,7 +21,7 @@ class Parser():
                 if data[0].lower() == ';name':
                     warrior.name = data[1]
             # actual instruction parsing
-            else:
+            elif line:
                 instruction = Parser.parse_instruction(line, i)
                 warrior.instructions.append(instruction)
         if warrior.instructions:

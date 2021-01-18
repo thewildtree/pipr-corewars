@@ -40,11 +40,13 @@ class Core():
 
     def rotate_warrior(self):
         """
-        Removes the currently active warrior if it does not have any active processes anymore.
+        Rotates current warrior's process if it has any left, otherwise removes the warrior.
         Changes the 'active' warrior to the next one on the list.
         """
         if len(self.current_warrior) == 0:
             self._remove_current_warrior()
+        else:
+            self.current_warrior.next_process()
         self._warrior_index = (self._warrior_index + 1) % len(self._warriors)
 
 
