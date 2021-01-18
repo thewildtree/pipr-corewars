@@ -9,7 +9,7 @@ def default_dat():
 
 class Core():
     def __init__(self, size=8000):
-        self._size = size
+        self.size = size
         self._instructions: List[CoreInstruction]
         self._warriors: List[CoreWarrior]
         self._warrior_index: int
@@ -18,7 +18,7 @@ class Core():
 
     def clear(self, default_instruction=default_dat()):
         self._instructions = []
-        for _ in range(self._size):
+        for _ in range(self.size):
             self._instructions.append(CoreInstruction(self, default_instruction))
         self._warriors = []
         self._warrior_index = 0
@@ -61,9 +61,9 @@ class Core():
     def normalize_value(self, value: int) -> int:
         "Returns a value converted into the range [0 - coreSize-1]"
         if value >= 0:
-            return value % self._size
+            return value % self.size
         while value < 0:
-            value += self._size
+            value += self.size
         return value
 
 
@@ -84,17 +84,17 @@ class Core():
     def __getitem__(self, key):
         if isinstance(key, slice):
             start = 0 if key.start is None else key.start
-            stop = self._size if key.stop is None else key.stop
+            stop = self.size if key.stop is None else key.stop
             if start > stop:
                 return self._instructions[start:] + self._instructions[:stop]
             else:
                 return self._instructions[start:stop]
         else:
-            return self._instructions[key % self._size]
+            return self._instructions[key % self.size]
 
 
     def __setitem__(self, key, value):
-        self._instructions[key % self._size] = value
+        self._instructions[key % self.size] = value
 
 
     def __iter__(self):
