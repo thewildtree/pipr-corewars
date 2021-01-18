@@ -11,10 +11,31 @@ def test_load_warrior():
     ])
     # tests if loading works properly when having to go 'through' the end of the memory
     core.load_warrior(warrior, core_size - 1)
-    assert core.warriors[0].current_pointer == core_size - 1
+    assert core.current_warrior.current_pointer == core_size - 1
     assert core[core_size - 1].op_code == OpCode.MOV
     # same as core[0]
     assert core[core_size].op_code == OpCode.DIV
+
+
+def test_rotate_warriors():
+    core = Core()
+    warrior = Warrior('test', [
+        Instruction(OpCode.MOV, Modifier.B, 0, AddressingMode('$'), 3, AddressingMode('#')),
+        Instruction(OpCode.DIV, Modifier.A, 22, AddressingMode('>'), 1, AddressingMode('$')),
+    ])
+    warrior2 = Warrior('test2', [
+        Instruction(OpCode.ADD, Modifier.X, 2, AddressingMode('}'), -5, AddressingMode('$')),
+        Instruction(OpCode.SPL, Modifier.A, 0, AddressingMode('>'), 2, AddressingMode('{')),
+    ])
+    core.load_warrior(warrior, 0)
+    core.load_warrior(warrior2, 10)
+    assert core.current_warrior.name == 'test'
+    # remove current warrior's only process
+    core.current_warrior.kill_current_process()
+    core.rotate_warrior()
+    assert core.current_warrior.name == 'test2'
+    # make sure the 'dead' warrior got removed
+    assert core.warriors_count == 1
 
 
 def test_instructions_separate():
@@ -39,13 +60,13 @@ def test_process_queue():
     assert warrior.current_pointer == 1
     warrior.add_process(2)
     warrior.add_process(3)
-    warrior.turn_next()
+    warrior.next_process()
     assert warrior.current_pointer == 2
-    warrior.kill_current()
-    warrior.turn_next()
+    warrior.kill_current_process()
+    warrior.next_process()
     assert not any(x == 2 for x in warrior._processes)
     assert warrior.current_pointer == 3
-    warrior.turn_next()
-    warrior.kill_current()
-    warrior.turn_next()
+    warrior.next_process()
+    warrior.kill_current_process()
+    warrior.next_process()
     assert warrior.current_pointer == 3

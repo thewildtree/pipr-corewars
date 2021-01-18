@@ -29,7 +29,7 @@ class Core():
         Loads all instructions of the given Warrior into the Core
         starting at the given address.
         """
-        if not address:
+        if address is None:
             # TODO: automatically determine the default address
             address = 2137
         # create initial process for the given warrior
@@ -41,7 +41,7 @@ class Core():
             self[address + i] = core_instruction
 
 
-    def switch_warrior(self):
+    def rotate_warrior(self):
         """
         Removes the currently active warrior if it does not have any active processes anymore.
         Changes the 'active' warrior to the next one on the list.
@@ -54,6 +54,11 @@ class Core():
     @property
     def current_warrior(self):
         return self._warriors[self._warrior_index]
+
+
+    @property
+    def warriors_count(self):
+        return len(self._warriors)
 
 
     def normalize_value(self, value: int) -> int:
@@ -97,6 +102,7 @@ class Core():
 
     def __iter__(self):
         return iter(self._instructions)
+
 
 
 class CoreInstruction(Instruction):
@@ -171,7 +177,7 @@ class CoreWarrior():
         self._processes.append(self._core.normalize_value(starting_address))
 
 
-    def kill_current(self):
+    def kill_current_process(self):
         """
         Simply removes the current proccess from the list.
         Requires turn_next() to be called afterwards to ensure proper behaviour.
