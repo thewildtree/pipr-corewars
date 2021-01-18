@@ -44,10 +44,10 @@ class AddressingMode(Enum):
     DIRECT = '$'
     A_INDIRECT = '*'
     B_INDIRECT = '@'
-    A_PREDEC_IND = '{'
-    A_POSTDEC_IND = '}'
-    B_PREDEC_IND = '<'
-    B_POSTDEC_IND = '>'
+    A_PREDEC = '{'
+    A_POSTINC = '}'
+    B_PREDEC = '<'
+    B_POSTINC = '>'
 
 
 @dataclass
