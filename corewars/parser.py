@@ -24,7 +24,10 @@ class Parser():
             else:
                 instruction = Parser.parse_instruction(line, i)
                 warrior.instructions.append(instruction)
-        return warrior
+        if warrior.instructions:
+            return warrior
+        else:
+            return None
 
 
     @staticmethod
