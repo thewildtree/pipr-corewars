@@ -1,7 +1,7 @@
 from copy import copy
 import operator
 from random import randint, randrange, shuffle
-from corewars.redcode import AddressingMode, Warrior
+from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode, Warrior
 from typing import List
 from corewars.core import Core
 from corewars.parser import Parser
@@ -102,4 +102,111 @@ class MARS():
             self.core[temp_pointer].a_value += 1
         elif inst_reg.a_mode == AddressingMode.B_POSTINC:
             self.core[temp_pointer].b_value += 1
+
+        # actual execution phase
+        op_code, modifier = inst_reg.op_code, inst_reg.modifier
+        src_address, dest_address = inst_pointer + a_pointer, inst_pointer + b_pointer
+        if op_code == OpCode.DAT:
+            # kills the current process
+            self.core.current_warrior.kill_current_process()
+        elif op_code == OpCode.MOV:
+            if modifier == Modifier.A:
+                self.core[dest_address].a_value = source_reg.a_value
+            elif modifier == Modifier.B:
+                self.core[dest_address].b_value = source_reg.b_value
+            elif modifier == Modifier.AB:
+                self.core[dest_address].b_value = source_reg.a_value
+            elif modifier == Modifier.BA:
+                self.core[dest_address].a_value = source_reg.b_value
+            elif modifier == Modifier.F:
+                self.core[dest_address].a_value = source_reg.a_value
+                self.core[dest_address].b_value = source_reg.b_value
+            elif modifier == Modifier.X:
+                self.core[dest_address].a_value = source_reg.b_value
+                self.core[dest_address].b_value = source_reg.a_value
+            elif modifier == Modifier.I:
+                # moves the whole instruction instead of just its operand values
+                self.core[dest_address] = source_reg
+        elif op_code == OpCode.ADD:
+            self._perform_math(operator.add, dest_address, modifier, source_reg, dest_reg)
+        elif op_code == OpCode.SUB:
+            self._perform_math(operator.sub, dest_address, modifier, source_reg, dest_reg)
+        elif op_code == OpCode.MUL:
+            self._perform_math(operator.mul, dest_address, modifier, source_reg, dest_reg)
+        elif op_code == OpCode.DIV:
+            self._perform_math(operator.floordiv, dest_address, modifier, source_reg, dest_reg)
+        elif op_code == OpCode.MOD:
+            self._perform_math(operator.mod, dest_address, modifier, source_reg, dest_reg)
+        elif op_code == OpCode.JMP:
+            # address from the A operand
+            self.core.current_warrior.current_pointer = src_address
+        elif op_code == OpCode.JMZ:
+            pass
+        elif op_code == OpCode.JMN:
+            pass
+        elif op_code == OpCode.DJN:
+            pass
+        elif op_code in [OpCode.SEQ, OpCode.CMP]:
+            pass
+        elif op_code == OpCode.SNE:
+            pass
+        elif op_code == OpCode.SLT:
+            pass
+        elif op_code == OpCode.SPL:
+            pass
+        elif op_code == OpCode.NOP:
+            pass
+
+
+
+    def _perform_math(
+        self, opr: operator, address: int, modifier: Modifier, src_reg: Instruction, dest_reg: Instruction
+    ):
+        """
+        Performs an arithmetical operation using the given operator.
+        Saves the result of said operation at the given address in the Core.
+        """
+        if modifier == Modifier.A:
+            self.core[address].a_value = opr(dest_reg.a_value, src_reg.a_value)
+        elif modifier == Modifier.B:
+            self.core[address].b_value = opr(dest_reg.b_value, src_reg.b_value)
+        elif modifier == Modifier.AB:
+            self.core[address].b_value = opr(dest_reg.b_value, src_reg.a_value)
+        elif modifier == Modifier.BA:
+            self.core[address].a_value = opr(dest_reg.a_value, src_reg.b_value)
+        elif modifier in [Modifier.F, Modifier.I]:
+            # combined A and B modifiers
+            self.core[address].a_value = opr(dest_reg.a_value, src_reg.a_value)
+            self.core[address].b_value = opr(dest_reg.b_value, src_reg.b_value)
+        elif modifier == Modifier.X:
+            # combined AB and BA
+            self.core[address].b_value = opr(dest_reg.b_value, src_reg.a_value)
+            self.core[address].a_value = opr(dest_reg.a_value, src_reg.b_value)
+
+
+    def _perform_compare(
+        self, opr: operator, modifier: Modifier, src_reg: Instruction, dest_reg: Instruction
+    ) -> bool:
+        """
+        Performs a comparison with a given operator.
+        Used when executing SEQ/CMP, SLT and SNE instructions.
+        Returns whether the instruction jump (skip) should be performed.
+        """
+        if modifier == Modifier.A:
+            return opr(src_reg.a_value, dest_reg.a_value)
+        elif modifier == Modifier.B:
+            return opr(src_reg.b_value, dest_reg.b_value)
+        elif modifier == Modifier.AB:
+            return opr(src_reg.a_value, dest_reg.b_value)
+        elif modifier == Modifier.BA:
+            return opr(src_reg.b_value, dest_reg.a_value)
+        elif modifier == Modifier.F:
+            return (opr(src_reg.a_value, dest_reg.a_value) and
+                    opr(src_reg.b_value, dest_reg.b_value))
+        elif modifier == Modifier.X:
+            return (opr(src_reg.a_value, dest_reg.b_value) and
+                    opr(src_reg.b_value, dest_reg.a_value))
+        elif modifier == Modifier.I:
+            return src_reg == dest_reg
+
 
