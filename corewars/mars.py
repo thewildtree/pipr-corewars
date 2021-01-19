@@ -159,11 +159,11 @@ class MARS():
             if not self._should_jump(modifier, dest_reg):
                 self.core.current_warrior.current_pointer = src_address
         elif op_code in [OpCode.SEQ, OpCode.CMP]:
-            pass
+            self._perform_skip(operator.eq, modifier, source_reg, dest_reg)
         elif op_code == OpCode.SNE:
-            pass
+            self._perform_skip(operator.ne, modifier, source_reg, dest_reg)
         elif op_code == OpCode.SLT:
-            pass
+            self._perform_skip(operator.lt, modifier, source_reg, dest_reg)
         elif op_code == OpCode.SPL:
             pass
         elif op_code == OpCode.NOP:
@@ -198,13 +198,17 @@ class MARS():
             self.core[address].a_value = opr(dest_reg.a_value, src_reg.b_value)
 
 
-    def _perform_compare(
+    def _perform_skip(self, opr: operator, modifier: Modifier, src_reg: Instruction, dest_reg: Instruction):
+        if self._should_skip(opr, modifier, src_reg, dest_reg):
+            self.core.current_warrior.current_pointer += 1
+
+    def _should_skip(
         self, opr: operator, modifier: Modifier, src_reg: Instruction, dest_reg: Instruction
     ) -> bool:
         """
         Performs a comparison with a given operator.
         Used when executing SEQ/CMP, SLT and SNE instructions.
-        Returns whether the instruction jump (skip) should be performed.
+        Returns whether the instruction skip should be performed.
         """
         if modifier == Modifier.A:
             return opr(src_reg.a_value, dest_reg.a_value)
