@@ -176,9 +176,12 @@ class CoreWarrior():
     def add_process(self, starting_address: int):
         """
         Creates a new process with its pointer set to the given address.
-        It is then added to the last position of the queue.
+        It is then added to the queue after the current process,
+        but is instantly skipped over - will be first executed during the next queue 'cycle'.
         """
-        self._processes.append(self._core.normalize_value(starting_address))
+        self._processes.insert(self._current_index + 1, self._core.normalize_value(starting_address))
+        # instantly switch to the 'new' process so that a next_process() afterwards will correctly 'skip' it
+        self.next_process()
 
 
     def kill_current_process(self):

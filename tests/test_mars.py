@@ -33,6 +33,20 @@ def test_instruction_dat():
     assert mars.core.warriors_count == 0
 
 
+def test_instruction_spl():
+    data = ['SPL 0']
+    mars = get_mars_with_warrior(data)
+    assert len(mars.core.current_warrior) == 1
+    # SPL call is executed
+    mars.cycle()
+    assert len(mars.core.current_warrior) == 2
+    # ensure the first process is still active (new process has to 'wait' 1 cycle)
+    assert mars.core.current_warrior.current_pointer == 1
+    # new process is executed
+    mars.cycle()
+    assert mars.core.current_warrior.current_pointer == 0
+
+
 def test_imp():
     with open('tests/warriors/imp.red') as file:
         imp = file.readlines()
