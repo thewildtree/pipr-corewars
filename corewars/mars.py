@@ -165,7 +165,9 @@ class MARS():
         elif op_code == OpCode.SLT:
             self._perform_skip(operator.lt, modifier, source_reg, dest_reg)
         elif op_code == OpCode.SPL:
-            pass
+            # adds a new process to the currently active warrior
+            # it will be executed the next time that warrior is active
+            self.core.current_warrior.add_process(src_address)
         elif op_code == OpCode.NOP:
             pass
 
