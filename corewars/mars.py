@@ -1,6 +1,6 @@
 from copy import copy
 import operator
-from random import randint, randrange, shuffle
+from random import randint, randrange, sample, shuffle
 from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode, Warrior
 from typing import List
 from corewars.core import Core
@@ -15,7 +15,7 @@ class MARS():
         self.core = Core()
 
 
-    def load_warriors(self, data_arrays: List[List[str]]):
+    def load_warriors(self, data_arrays: List[List[str]], starting_address: int = None):
         """
         Parses each of the provided arrays as separate warriors and loads them into the Core.
         """
@@ -25,12 +25,13 @@ class MARS():
             if warrior:
                 warriors.append(warrior)
         spacing = self.core.size // len(warriors)
-        starting_address = randrange(0, self.core.size)
+        if starting_address is None:
+            starting_address = randrange(0, self.core.size)
         # randomize order in which warriors are loaded
         shuffle(warriors)
         for i, warrior in enumerate(warriors):
-            # add small random offset to each starting address
-            spacing_offset = randint(-50, 50)
+            # add small random offset to each starting address apart from the 1st one
+            spacing_offset = 0 if i == 0 else randint(-50, 50)
             address = starting_address + i * (spacing + spacing_offset)
             self.core.load_warrior(warrior, address)
 
@@ -42,6 +43,8 @@ class MARS():
         temp_pointer: int = 0 # used for keeping addresses in case we need to post-increment
         # determine the current warrior
         warrior = self.core.current_warrior
+        if not warrior:
+            return
         # determine address of the instruction that we want to execute
         inst_pointer = warrior.current_pointer
         # copy it to the instruction register
@@ -106,6 +109,8 @@ class MARS():
         # actual execution phase
         op_code, modifier = inst_reg.op_code, inst_reg.modifier
         src_address, dest_address = inst_pointer + a_pointer, inst_pointer + b_pointer
+        # increment current process' pointer (might be overwritten by a JMP instruction)
+        self.core.current_warrior.current_pointer += 1
         if op_code == OpCode.DAT:
             # kills the current process
             self.core.current_warrior.kill_current_process()
@@ -157,6 +162,8 @@ class MARS():
         elif op_code == OpCode.NOP:
             pass
 
+        # move to the next warrior (automatically kills ones without any processes left)
+        self.core.rotate_warrior()
 
 
     def _perform_math(
