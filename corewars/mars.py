@@ -146,11 +146,18 @@ class MARS():
             # address from the A operand
             self.core.current_warrior.current_pointer = src_address
         elif op_code == OpCode.JMZ:
-            pass
+            if self._should_jump(modifier, dest_reg):
+                self.core.current_warrior.current_pointer = src_address
         elif op_code == OpCode.JMN:
-            pass
+            if not self._should_jump(modifier, dest_reg):
+                self.core.current_warrior.current_pointer = src_address
         elif op_code == OpCode.DJN:
-            pass
+            # decrement values in the destination (B) register before checking
+            # can do that safely since they're not gonna be used for anything else later
+            dest_reg.a_value -= 1
+            dest_reg.b_value -= 1
+            if not self._should_jump(modifier, dest_reg):
+                self.core.current_warrior.current_pointer = src_address
         elif op_code in [OpCode.SEQ, OpCode.CMP]:
             pass
         elif op_code == OpCode.SNE:
@@ -217,3 +224,11 @@ class MARS():
             return src_reg == dest_reg
 
 
+    def _should_jump(self, modifier: Modifier, dest_reg: Instruction) -> bool:
+        if modifier in [Modifier.A, Modifier.BA]:
+            return dest_reg.a_value == 0
+        elif modifier in [Modifier.B, Modifier.AB]:
+            return dest_reg.b_value == 0
+        else:
+            # F, X and I modifiers
+            return dest_reg.a_value == dest_reg.b_value == 0
