@@ -47,11 +47,16 @@ class Core():
             self._remove_current_warrior()
         else:
             self.current_warrior.next_process()
-        self._warrior_index = (self._warrior_index + 1) % len(self._warriors)
+        if len(self._warriors) == 0:
+            self._warrior_index = 0
+        else:
+            self._warrior_index = (self._warrior_index + 1) % len(self._warriors)
 
 
     @property
     def current_warrior(self):
+        if len(self._warriors) == 0:
+            return None
         return self._warriors[self._warrior_index]
 
 
