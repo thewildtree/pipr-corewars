@@ -139,9 +139,15 @@ class MARS():
         elif op_code == OpCode.MUL:
             self._perform_math(operator.mul, dest_address, modifier, source_reg, dest_reg)
         elif op_code == OpCode.DIV:
-            self._perform_math(operator.floordiv, dest_address, modifier, source_reg, dest_reg)
+            try:
+                self._perform_math(operator.floordiv, dest_address, modifier, source_reg, dest_reg)
+            except ZeroDivisionError:
+                self.core.current_warrior.kill_current_process()
         elif op_code == OpCode.MOD:
-            self._perform_math(operator.mod, dest_address, modifier, source_reg, dest_reg)
+            try:
+                self._perform_math(operator.mod, dest_address, modifier, source_reg, dest_reg)
+            except ZeroDivisionError:
+                self.core.current_warrior.kill_current_process()
         elif op_code == OpCode.JMP:
             # address from the A operand
             self.core.current_warrior.current_pointer = src_address

@@ -33,6 +33,15 @@ def test_instruction_dat():
     assert mars.core.warriors_count == 0
 
 
+def test_instruction_div_by_zero():
+    # checks if division by zero kills the process (and thus, the warrior)
+    data = ['DIV 1, 2', 'DAT 0, 0', 'DAT 1, 1']
+    mars = get_mars_with_warrior(data)
+    assert mars.core.warriors_count == 1
+    mars.cycle()
+    assert mars.core.warriors_count == 0
+
+
 def test_instruction_spl():
     data = ['SPL 0']
     mars = get_mars_with_warrior(data)
