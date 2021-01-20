@@ -1,5 +1,6 @@
 from dataclasses import field
-from typing import List
+from typing import List, Tuple
+from random import shuffle
 from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode, Warrior
 
 
@@ -51,6 +52,16 @@ class Core():
             self._warrior_index = 0
         else:
             self._warrior_index = (self._warrior_index + 1) % len(self._warriors)
+
+
+    def assign_colors(self, colors: List[Tuple[int, int, int]]):
+        """
+        Assigns one unique colour to each Warrior present in the Core.
+        Used for the visual representation of what happends during the battle.
+        """
+        shuffle(colors)
+        for warrior in self._warriors:
+            warrior.color = colors.pop()
 
 
     @property
@@ -160,6 +171,8 @@ class CoreWarrior():
         self._core = core
         self._current_index = 0
         self._processes: List[int] = []
+        # used for visual representation of the warriors' actions, white by default
+        self.color = (255, 255, 255)
         # a list of integers - each one is an instruction pointer for one process
         # pointers contain absolute Core memory addresses.
         self.add_process(initial_address)

@@ -36,11 +36,13 @@ class MARS():
             self.core.load_warrior(warrior, address)
 
 
-    def cycle(self):
+    def cycle(self) -> List[int]:
         """
         Runs one simulation cycle - executes one task of the currently active warrior.
+        Returns addresses of core cells that were accessed during the cycle.
         """
         temp_pointer: int = 0 # used for keeping addresses in case we need to post-increment
+        cells_written = [] # keeps track of what cells we've written data to
         # determine the current warrior
         warrior = self.core.current_warrior
         if not warrior:
@@ -62,8 +64,10 @@ class MARS():
                 # pre-decrement if necessary
                 if inst_reg.a_mode == AddressingMode.A_PREDEC:
                     self.core[temp_pointer].a_value -= 1
+                    cells_written.append(temp_pointer)
                 elif inst_reg.a_mode == AddressingMode.B_PREDEC:
                     self.core[temp_pointer].b_value -= 1
+                    cells_written.append(temp_pointer)
                 # determine the address of our actual source (A) instruction
                 if inst_reg.a_mode in [AddressingMode.A_PREDEC, AddressingMode.A_POSTINC, AddressingMode.A_INDIRECT]:
                     a_pointer = a_pointer + self.core[temp_pointer].a_value
@@ -76,8 +80,10 @@ class MARS():
         # post-increment if necessary
         if inst_reg.a_mode == AddressingMode.A_POSTINC:
             self.core[temp_pointer].a_value += 1
+            cells_written.append(temp_pointer)
         elif inst_reg.a_mode == AddressingMode.B_POSTINC:
             self.core[temp_pointer].b_value += 1
+            cells_written.append(temp_pointer)
         # evaluating the A operand - almost identical to B
         if inst_reg.b_mode == AddressingMode.IMMEDIATE:
             # immediate operand values are always evaluated as an address of 0
@@ -91,8 +97,10 @@ class MARS():
                 # pre-decrement if necessary
                 if inst_reg.b_mode == AddressingMode.A_PREDEC:
                     self.core[temp_pointer].a_value -= 1
+                    cells_written.append(temp_pointer)
                 elif inst_reg.b_mode == AddressingMode.B_PREDEC:
                     self.core[temp_pointer].b_value -= 1
+                    cells_written.append(temp_pointer)
                 # determine the address of our actual source (A) instruction
                 if inst_reg.b_mode in [AddressingMode.A_PREDEC, AddressingMode.A_POSTINC, AddressingMode.A_INDIRECT]:
                     b_pointer = b_pointer + self.core[temp_pointer].a_value
@@ -102,11 +110,15 @@ class MARS():
         # copy source instruction to register
         dest_address = inst_pointer + b_pointer
         dest_reg = copy(self.core[dest_address])
+        # for simplicity let's assume that the destination address is always written to
+        cells_written.append(dest_address)
         # post-increment if necessary
         if inst_reg.b_mode == AddressingMode.A_POSTINC:
             self.core[temp_pointer].a_value += 1
+            cells_written.append(temp_pointer)
         elif inst_reg.b_mode == AddressingMode.B_POSTINC:
             self.core[temp_pointer].b_value += 1
+            cells_written.append(temp_pointer)
 
         # actual execution phase
         op_code, modifier = inst_reg.op_code, inst_reg.modifier
@@ -179,9 +191,10 @@ class MARS():
             self.core.current_warrior.add_process(source_address)
         elif op_code == OpCode.NOP:
             pass
-
         # move to the next warrior (automatically kills ones without any processes left)
         self.core.rotate_warrior()
+        # return address written to during execution
+        return cells_written
 
 
     def _perform_math(
