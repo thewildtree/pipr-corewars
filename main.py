@@ -4,11 +4,14 @@ import pygame
 from typing import List
 from corewars.mars import MARS
 
-
 CELLS_PER_LINE = 100
 LINES = 80
 CELL_SIZE = 10
 SPACING = 2
+SIDEBAR_WIDTH = 350
+
+WINDOW_WIDTH = SPACING + (CELLS_PER_LINE * (CELL_SIZE + SPACING)) + SIDEBAR_WIDTH
+WINDOW_HEIGHT = SPACING + (LINES * (CELL_SIZE + SPACING))
 
 COLOURS = [
     (55, 183, 106), # green
@@ -29,7 +32,7 @@ def main():
         return
     pygame.init()
     # 1202px horizontal, 962px needed (10px per square, 2px spacing)
-    screen = pygame.display.set_mode((1400, 962))
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     warriors_data = [open(file).readlines() for file in warrior_files]
     run_simulation(screen, warriors_data)
 
@@ -39,6 +42,14 @@ def run_simulation(screen, warriors_data: List[List[str]]):
     mars = MARS()
     mars.load_warriors(warriors_data)
     mars.core.assign_colors(COLOURS)
+    # initial stats display
+    screen.fill((0, 0, 0))
+    pygame.draw.line(
+        screen,
+        (255, 255, 255),
+        (WINDOW_WIDTH - SIDEBAR_WIDTH, 0),
+        (WINDOW_WIDTH - SIDEBAR_WIDTH, WINDOW_HEIGHT)
+    )
     # initial cell display
     for i, _ in enumerate(mars.core):
         cell = create_cursor_cell(BASE_CELL_COLOUR)
