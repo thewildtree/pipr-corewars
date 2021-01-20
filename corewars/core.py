@@ -14,6 +14,7 @@ class Core():
         self._instructions: List[CoreInstruction]
         self._warriors: List[CoreWarrior]
         self._warrior_index: int
+        self._dead_warriors: List[CoreWarrior]
         self.clear()
 
 
@@ -23,6 +24,7 @@ class Core():
             self._instructions.append(CoreInstruction(self, default_instruction))
         self._warriors = []
         self._warrior_index = 0
+        self._dead_warriors = []
 
 
     def load_warrior(self, warrior: Warrior, address: int):
@@ -76,6 +78,17 @@ class Core():
         return len(self._warriors)
 
 
+    # only used for 'leaderboard' display purposes
+    @property
+    def warriors(self):
+        return self._warriors
+
+
+    @property
+    def dead_warriors(self):
+        return self._dead_warriors
+
+
     def normalize_value(self, value: int) -> int:
         "Returns a value converted into the range [0 - coreSize-1]"
         if value >= 0:
@@ -90,6 +103,7 @@ class Core():
         Rremoves the current warrior from the core.
         Requires next_warrior() to be called afterwards to ensure proper behaviour.
         """
+        self._dead_warriors.append(self._warriors[self._warrior_index])
         self._warriors.remove(self._warriors[self._warrior_index])
         # in most cases switch backwards (turn_next() will correctly jump to next process afterwards)
         if self._warrior_index != 0:
