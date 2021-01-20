@@ -60,6 +60,14 @@ class Instruction():
     b_mode: AddressingMode
 
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
+    def __str__(self) -> str:
+        return f'{self.op_code.name}.{self.modifier.name} {self.a_mode.value}{self.a_value}, {self.b_mode.value}{self.b_value}'
+
+
 @dataclass
 class Warrior():
     name: str
