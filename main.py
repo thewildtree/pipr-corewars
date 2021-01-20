@@ -45,7 +45,7 @@ def run_simulation(screen, warriors_data: List[List[str]]):
         pos = get_position(i, mars.core.size)
         screen.blit(cell, pos)
     # initial cursor display
-    display_cursor_cell(screen, mars)
+    display_cursor(screen, mars)
     pygame.display.flip()
     # main game loop
     loop = True
@@ -58,10 +58,12 @@ def run_simulation(screen, warriors_data: List[List[str]]):
                 if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_CTRL:
                     run_again = True
                     loop = False
+        # change previous cursor to warrior's colour
+        display_cursor(screen, mars)
         # run one simulation cycle
         addresses = mars.cycle()
-        # current warrior's pointer
-        display_cursor_cell(screen, mars)
+        # show current warrior's pointer (blink white)
+        display_cursor(screen, mars, True)
         # cells accessed / written to during this cycle
         color = mars.core.current_warrior.color
         for address in addresses:
@@ -73,9 +75,10 @@ def run_simulation(screen, warriors_data: List[List[str]]):
         run_simulation(screen, warriors_data)
 
 
-def display_cursor_cell(screen, mars: MARS):
+def display_cursor(screen, mars: MARS, white=False):
     cursor = mars.core.current_warrior.current_pointer
-    cell = create_cursor_cell(mars.core.current_warrior.color)
+    color = (255, 255, 255) if white else mars.core.current_warrior.color
+    cell = create_cursor_cell(color)
     pos = get_position(cursor, mars.core.size)
     screen.blit(cell, pos)
 
