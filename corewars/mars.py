@@ -1,6 +1,6 @@
 from copy import copy
 import operator
-from random import randint, randrange, sample, shuffle
+from random import randint, randrange, shuffle
 from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode, Warrior
 from typing import List
 from corewars.core import Core
@@ -101,9 +101,9 @@ class MARS():
         # copy source instruction to register
         dest_reg = copy(self.core[inst_pointer + b_pointer])
         # post-increment if necessary
-        if inst_reg.a_mode == AddressingMode.A_POSTINC:
+        if inst_reg.b_mode == AddressingMode.A_POSTINC:
             self.core[temp_pointer].a_value += 1
-        elif inst_reg.a_mode == AddressingMode.B_POSTINC:
+        elif inst_reg.b_mode == AddressingMode.B_POSTINC:
             self.core[temp_pointer].b_value += 1
 
         # actual execution phase
