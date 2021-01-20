@@ -19,7 +19,6 @@ SIDEBAR_START = WINDOW_WIDTH - SIDEBAR_WIDTH
 INFO_MARGIN = 20
 ENTRY_SPACING = (WINDOW_WIDTH - 200) // 15
 
-
 COLOURS = [
     (55, 183, 106), # green
     (75, 160, 227), # blue
@@ -102,7 +101,8 @@ def run_simulation(screen, warriors_data: List[List[str]], max_cycles: int):
         # one warrior left = win
         if mars.core.warriors_count == 1:
             game_ended = True
-            write_text(sidebar, f'{mars.core.current_warrior.name.upper()} WINS!', INFO_MARGIN, 100, 'Gold')
+            write_text(sidebar, f'{mars.core.current_warrior.name.upper()} WINS!',
+                       INFO_MARGIN, 100, 'Gold')
         # max cycles passed = tie
         elif cycles + 1 >= max_cycles:
             game_ended = True
