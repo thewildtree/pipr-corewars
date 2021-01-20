@@ -1,6 +1,7 @@
 import os
 import glob
 import pygame
+from typing import List
 from corewars.mars import MARS
 
 
@@ -22,19 +23,22 @@ BASE_CELL_COLOUR = (30, 30, 30)
 
 def main():
     # laod warriors
-    print(os.getcwd())
     warrior_files = glob.glob(os.path.join(os.getcwd(), "warriors", "*.red"))
     if not warrior_files:
         print('No warrior files found. Aborting...')
         return
+    pygame.init()
+    # 1202px horizontal, 962px needed (10px per square, 2px spacing)
+    screen = pygame.display.set_mode((1400, 962))
     warriors_data = [open(file).readlines() for file in warrior_files]
+    run_simulation(screen, warriors_data)
+
+
+def run_simulation(screen, warriors_data: List[List[str]]):
+    # initialize the simulator and load up provided warriors
     mars = MARS()
     mars.load_warriors(warriors_data)
     mars.core.assign_colors(COLOURS)
-    pygame.init()
-    # 1202 pixels needed for the display, 10px per square, 2px spacing
-    # 962 vertical
-    screen = pygame.display.set_mode((1400, 962))
     # initial cell display
     for i, _ in enumerate(mars.core):
         cell = create_cursor_cell(BASE_CELL_COLOUR)
@@ -45,10 +49,15 @@ def main():
     pygame.display.flip()
     # main game loop
     loop = True
+    run_again = False
     while loop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 loop = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                    run_again = True
+                    loop = False
         # run one simulation cycle
         addresses = mars.cycle()
         # current warrior's pointer
@@ -60,6 +69,8 @@ def main():
             pos = get_position(address, mars.core.size)
             screen.blit(cell, pos)
         pygame.display.flip()
+    if run_again:
+        run_simulation(screen, warriors_data)
 
 
 def display_cursor_cell(screen, mars: MARS):
@@ -77,8 +88,8 @@ def create_cursor_cell(color):
 
 def create_written_cell(color):
     cell = pygame.Surface((CELL_SIZE, CELL_SIZE))
-    pygame.draw.line(cell, color, (0, 0), (CELL_SIZE, CELL_SIZE))
-    pygame.draw.line(cell, color, (0, CELL_SIZE), (CELL_SIZE, 0))
+    pygame.draw.aaline(cell, color, (0, 0), (CELL_SIZE, CELL_SIZE))
+    pygame.draw.aaline(cell, color, (0, CELL_SIZE), (CELL_SIZE, 0))
     return cell
 
 
