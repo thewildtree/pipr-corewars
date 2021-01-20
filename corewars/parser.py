@@ -17,7 +17,7 @@ class Parser():
             # comment lines - we should only check for them before the code starts
             # for now let's ignore that check
             if line.startswith(';'):
-                data = line.split()
+                data = line.split(maxsplit=1)
                 if data[0].lower() == ';name':
                     warrior.name = data[1]
             # actual instruction parsing
