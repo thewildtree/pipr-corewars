@@ -1,6 +1,6 @@
 from dataclasses import field
 from typing import List, Tuple
-from random import shuffle
+from random import sample
 from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode, Warrior
 
 
@@ -59,9 +59,9 @@ class Core():
         Assigns one unique colour to each Warrior present in the Core.
         Used for the visual representation of what happends during the battle.
         """
-        shuffle(colors)
+        shuffled_colors = sample(colors, len(colors))
         for warrior in self._warriors:
-            warrior.color = colors.pop()
+            warrior.color = shuffled_colors.pop()
 
 
     @property
