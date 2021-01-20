@@ -107,6 +107,11 @@ def run_simulation(screen, warriors_data: List[List[str]], max_cycles: int):
         elif cycles + 1 >= max_cycles:
             game_ended = True
             write_text(sidebar, 'GAME OVER - NO WINNER.', INFO_MARGIN, 50, 'Red')
+        write_text(
+            sidebar,
+            f'instruction: {str(mars.core[mars.core.current_warrior.current_pointer])}',
+            INFO_MARGIN, WINDOW_HEIGHT - 60
+        )
         write_text(sidebar, 'CTRL-R to reset', INFO_MARGIN, WINDOW_HEIGHT - 30)
         screen.blit(sidebar, (SIDEBAR_START, 0))
         # cells accessed / written to during this cycle
