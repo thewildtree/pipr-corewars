@@ -71,7 +71,8 @@ class MARS():
                 else:
                     a_pointer = a_pointer + self.core[temp_pointer].b_value
         # copy source instruction to register
-        source_reg = copy(self.core[inst_pointer + a_pointer])
+        source_address = inst_pointer + a_pointer
+        source_reg = copy(self.core[source_address])
         # post-increment if necessary
         if inst_reg.a_mode == AddressingMode.A_POSTINC:
             self.core[temp_pointer].a_value += 1
@@ -99,7 +100,8 @@ class MARS():
                 else:
                     b_pointer = b_pointer + self.core[temp_pointer].b_value
         # copy source instruction to register
-        dest_reg = copy(self.core[inst_pointer + b_pointer])
+        dest_address = inst_pointer + b_pointer
+        dest_reg = copy(self.core[dest_address])
         # post-increment if necessary
         if inst_reg.b_mode == AddressingMode.A_POSTINC:
             self.core[temp_pointer].a_value += 1
@@ -108,7 +110,6 @@ class MARS():
 
         # actual execution phase
         op_code, modifier = inst_reg.op_code, inst_reg.modifier
-        src_address, dest_address = inst_pointer + a_pointer, inst_pointer + b_pointer
         # increment current process' pointer (might be overwritten by a JMP instruction)
         self.core.current_warrior.current_pointer += 1
         if op_code == OpCode.DAT:
@@ -150,20 +151,22 @@ class MARS():
                 self.core.current_warrior.kill_current_process()
         elif op_code == OpCode.JMP:
             # address from the A operand
-            self.core.current_warrior.current_pointer = src_address
+            self.core.current_warrior.current_pointer = source_address
         elif op_code == OpCode.JMZ:
             if self._should_jump(modifier, dest_reg):
-                self.core.current_warrior.current_pointer = src_address
+                self.core.current_warrior.current_pointer = source_address
         elif op_code == OpCode.JMN:
             if not self._should_jump(modifier, dest_reg):
-                self.core.current_warrior.current_pointer = src_address
+                self.core.current_warrior.current_pointer = source_address
         elif op_code == OpCode.DJN:
-            # decrement values in the destination (B) register before checking
-            # can do that safely since they're not gonna be used for anything else later
-            dest_reg.a_value -= 1
-            dest_reg.b_value -= 1
+            # decrement necessary values in the core and re-fetch them to the dest. register
+            if modifier in [Modifier.A, Modifier.BA, Modifier.X, Modifier.F, Modifier.I]:
+                self.core[dest_address].a_value -= 1
+            if modifier in [Modifier.B, Modifier.AB, Modifier.X, Modifier.F, Modifier.I]:
+                self.core[dest_address].b_value -= 1
+            dest_reg = copy(self.core[dest_address])
             if not self._should_jump(modifier, dest_reg):
-                self.core.current_warrior.current_pointer = src_address
+                self.core.current_warrior.current_pointer = source_address
         elif op_code in [OpCode.SEQ, OpCode.CMP]:
             self._perform_skip(operator.eq, modifier, source_reg, dest_reg)
         elif op_code == OpCode.SNE:
@@ -173,7 +176,7 @@ class MARS():
         elif op_code == OpCode.SPL:
             # adds a new process to the currently active warrior
             # it will be executed the next time that warrior is active
-            self.core.current_warrior.add_process(src_address)
+            self.core.current_warrior.add_process(source_address)
         elif op_code == OpCode.NOP:
             pass
 
