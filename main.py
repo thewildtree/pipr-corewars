@@ -37,7 +37,7 @@ def main():
     print(pygame.font.get_fonts())
     parser = argparse.ArgumentParser(description='Core Wars')
     parser.add_argument('--cycles', '-c', dest='cycles', type=int, nargs='?',
-                        default=800, help='Max sim. cycles before round end')
+                        default=80000, help='Max sim. cycles before round end')
     parser.add_argument('--warriors', type=str, default='warriors',
                         help='Name of the folder containing warrior files')
     args = parser.parse_args()
