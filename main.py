@@ -24,7 +24,8 @@ COLOURS = [
     (75, 160, 227), # blue
     (255, 159, 16), # orange
     (206, 55, 70),  # red
-    (240, 76, 169)  # dark blue
+    (240, 76, 169),  # dark blue
+    (204, 175, 175) # pink-ish
 ]
 
 BASE_CELL_COLOUR = (30, 30, 30)
@@ -33,7 +34,6 @@ FONT_SIZE = 20
 
 
 def main():
-    print(pygame.font.get_fonts())
     parser = argparse.ArgumentParser(description='Core Wars')
     parser.add_argument('--cycles', '-c', dest='cycles', type=int, nargs='?',
                         default=80000, help='Max sim. cycles before round end')
@@ -43,10 +43,13 @@ def main():
     # laod warriors
     warrior_files = glob.glob(os.path.join(os.getcwd(), "warriors", "*.red"))
     if not warrior_files:
-        print('No warrior files found. Aborting...')
+        print('ERROR: No warrior files found. Aborting...')
+        return
+    elif not (2 <= len(warrior_files) <= 6):
+        print('ERROR: Only battles between 2-6 warriors are supported.')
         return
     pygame.init()
-    # 1202px horizontal, 962px needed (10px per square, 2px spacing)
+    # 1202px horizontal, 962px vertical needed at minimum (10px per square, 2px spacing)
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     warriors_data = [open(file).readlines() for file in warrior_files]
     run_simulation(screen, warriors_data, args.cycles)
@@ -80,10 +83,12 @@ def run_simulation(screen, warriors_data: List[List[str]], max_cycles: int):
             if event.type == pygame.QUIT:
                 loop = False
             elif event.type == pygame.KEYDOWN:
+                # simulation reset
                 if event.key == pygame.K_r and pygame.key.get_mods() & pygame.KMOD_CTRL:
                     run_again = True
                     loop = False
         if game_ended:
+            # prevents closing the window after game is finished
             continue
         # change previous cursor to warrior's colour
         display_cursor(screen, mars)
@@ -130,6 +135,7 @@ def run_simulation(screen, warriors_data: List[List[str]], max_cycles: int):
 
 
 def display_cursor(screen, mars: MARS, white=False):
+    "Displays where in the memory the current process is pointing to."
     cursor = mars.core.current_warrior.current_pointer
     color = (255, 255, 255) if white else mars.core.current_warrior.color
     cell = create_cursor_cell(color)
@@ -138,12 +144,14 @@ def display_cursor(screen, mars: MARS, white=False):
 
 
 def create_cursor_cell(color):
+    "Creates a simple square surface filled with the given color."
     cell = pygame.Surface((CELL_SIZE, CELL_SIZE))
     cell.fill(color)
     return cell
 
 
 def create_written_cell(color):
+    "Creates a surface with an X symbol in the provided color on it."
     cell = pygame.Surface((CELL_SIZE, CELL_SIZE))
     pygame.draw.aaline(cell, color, (0, 0), (CELL_SIZE, CELL_SIZE))
     pygame.draw.aaline(cell, color, (0, CELL_SIZE), (CELL_SIZE, 0))
@@ -151,6 +159,10 @@ def create_written_cell(color):
 
 
 def print_warrior_info(sidebar, pos: int, warrior: CoreWarrior):
+    """
+    Shows information about the given warrior on the sidebar.
+    Vertical drawing offset is determined based on the provided "position" parameter.
+    """
     v_margin = 200 + (pos * ENTRY_SPACING)
     warrior_entry = pygame.Surface((SIDEBAR_WIDTH, ENTRY_SPACING))
     warrior_entry.fill(SIDEBAR_COLOUR)
@@ -166,12 +178,14 @@ def print_warrior_info(sidebar, pos: int, warrior: CoreWarrior):
 
 
 def write_text(screen, text: str, x: int, y: int, color='White'):
+    "Shows provided text at the given position on screen."
     font = pygame.font.Font(pygame.font.get_default_font(), FONT_SIZE)
     text = font.render(text, True, pygame.Color(color))
     screen.blit(text, (x, y))
 
 
 def get_position(address: int, core_size):
+    "Returns on-screen position of a memory cell from the given address."
     # addresses might be passed here before Core itself normalizes them
     address = address % core_size
     y = SPACING + (address // CELLS_PER_LINE) * (CELL_SIZE + SPACING)
