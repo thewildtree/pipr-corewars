@@ -7,11 +7,11 @@ ADDRESS = 0
 
 def test_load_warrior():
     mars = MARS()
-    with open('warriors/imp.red') as file:
+    with open('tests/warriors/imp.red') as file:
         imp = file.readlines()
     warriors_data = [imp, imp]
     mars.load_warriors(warriors_data)
-    assert mars.core.current_warrior.name == "IMP"
+    assert mars.core.current_warrior.name == "Imp"
     assert mars.core.warriors_count == 2
     assert any(instruction.op_code == OpCode.MOV for instruction in mars.core)
 
@@ -57,18 +57,18 @@ def test_instruction_spl():
 
 
 def test_imp():
-    with open('warriors/imp.red') as file:
+    with open('tests/warriors/imp.red') as file:
         imp = file.readlines()
     mars = get_mars_with_warrior(imp)
     assert mars.core[ADDRESS] != mars.core[ADDRESS + 1]
     mars.cycle()
-    assert mars.core[ADDRESS] == mars.core[ADDRESS + 1]
+    assert mars.core[ADDRESS].op_code == mars.core[ADDRESS + 1].op_code
 
 
 def test_dwarf():
     # tests behaviour of one of the basic warriors - the Dwarf
     # basically drops DATs every 4 instructions
-    with open('warriors/dwarf.red') as file:
+    with open('tests/warriors/dwarf.red') as file:
         dwarf = file.readlines()
     mars = get_mars_with_warrior(dwarf)
     mars.cycle()

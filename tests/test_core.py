@@ -59,14 +59,22 @@ def test_process_queue():
     warrior = CoreWarrior(core, 'test', 1)
     assert warrior.current_pointer == 1
     warrior.add_process(2)
+    # this should keep 1 as the current process
+    warrior.next_process()
+    assert warrior.current_pointer == 1
+    # this one is added by 1 - so it's in queue 'before' 2
     warrior.add_process(3)
+    assert warrior.current_pointer == 3
+    warrior.kill_current_process()
     warrior.next_process()
+    # 3 should be dead and 2 should be the active one
+    assert not any(x == 3 for x in warrior._processes)
+    assert len(warrior) == 2
     assert warrior.current_pointer == 2
-    warrior.kill_current_process()
-    warrior.next_process()
-    assert not any(x == 2 for x in warrior._processes)
-    assert warrior.current_pointer == 3
+    # rotate to 1 and kill it
     warrior.next_process()
     warrior.kill_current_process()
     warrior.next_process()
-    assert warrior.current_pointer == 3
+    # 2 will be the only process left
+    assert warrior.current_pointer == 2
+    assert len(warrior) == 1
