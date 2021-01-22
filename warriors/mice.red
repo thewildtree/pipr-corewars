@@ -1,5 +1,5 @@
-;name MICE
 ;name Mice
+
 MOV.AB #12, $-1
 MOV.I  @-2, <5
 DJN.B  $-1, $-3
