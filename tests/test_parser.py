@@ -1,7 +1,6 @@
 import pytest
 from corewars.redcode import AddressingMode, Instruction, Modifier, OpCode
-from corewars.parser import Parser
-from corewars.exceptions import ParserException
+from corewars.parser import Parser, ParserException
 
 
 def test_instruction_parse():

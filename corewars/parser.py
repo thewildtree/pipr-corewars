@@ -1,8 +1,11 @@
 from typing import List
 import re
 from .redcode import Instruction, Modifier, OpCode, AddressingMode, Warrior
-from .exceptions import ParserException
 
+
+class ParserException(Exception):
+    def __init__(self, line_number: int, line_content: str, message: str):
+        super().__init__(f'{message} -- line {line_number}, content: {line_content}')
 
 
 class Parser():
