@@ -49,6 +49,7 @@ def main():
         print('ERROR: Only battles between 2-6 warriors are supported.')
         return
     pygame.init()
+    pygame.display.set_caption('Core Wars')
     # 1202px horizontal, 962px vertical needed at minimum (10px per square, 2px spacing)
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     warriors_data = [open(file).readlines() for file in warrior_files]
