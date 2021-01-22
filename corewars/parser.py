@@ -8,6 +8,10 @@ from .exceptions import ParserException
 class Parser():
     @staticmethod
     def parse_warrior(lines: List[str]) -> Warrior:
+        """
+        Attempts to parse all the provided strings as Redcode instructions of one warrior.
+        Returns: a Warrior object upon succeeding, None value otherwise.
+        """
         warrior = Warrior(
             name="Warrior",
             instructions=[]
@@ -32,6 +36,10 @@ class Parser():
 
     @staticmethod
     def parse_instruction(line: str, index: int = 0) -> Instruction:
+        """
+        Attempts to parse a given line as either a comment or a Redcode instruction.
+        Throws exceptions if instructions are found but don't suit a given set of criteria.
+        """
         # temporary - uppercase everything
         line = line.upper()
         # instruction regex - pretty basic, but works fine

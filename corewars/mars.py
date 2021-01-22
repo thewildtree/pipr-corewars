@@ -39,7 +39,7 @@ class MARS():
     def cycle(self) -> List[int]:
         """
         Runs one simulation cycle - executes one task of the currently active warrior.
-        Returns addresses of core cells that were accessed during the cycle.
+        Returns addresses of memory cells which were accessed during the cycle.
         """
         temp_pointer: int = 0 # used for keeping addresses in case we need to post-increment
         cells_written = [] # keeps track of what cells we've written data to
@@ -225,6 +225,7 @@ class MARS():
     def _perform_skip(self, opr: operator, modifier: Modifier, src_reg: Instruction, dest_reg: Instruction):
         if self._should_skip(opr, modifier, src_reg, dest_reg):
             self.core.current_warrior.current_pointer += 1
+
 
     def _should_skip(
         self, opr: operator, modifier: Modifier, src_reg: Instruction, dest_reg: Instruction

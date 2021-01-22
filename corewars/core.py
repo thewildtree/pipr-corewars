@@ -19,6 +19,7 @@ class Core():
 
 
     def clear(self, default_instruction=default_dat()):
+        "Fills core with default instruction (DAT 0,0 unless different is provided)."
         self._instructions = []
         for _ in range(self.size):
             self._instructions.append(CoreInstruction(self, default_instruction))
@@ -197,6 +198,9 @@ class CoreWarrior():
 
 
     def next_process(self):
+        """
+        Switches this warrior's current process to the next one in the queue.
+        """
         self._current_index = (self._current_index + 1) % len(self._processes)
 
 
