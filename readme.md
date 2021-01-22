@@ -33,7 +33,7 @@ Główna część projektu (folder `corewars`) podzielona została na kilka plik
 
 W folderze `tests` znajdują się również testy jednostkowe sprawdzające poprawność działania poszczególnych komponentów.
 
-Wszystko 'spina` w całość kod zawarty w pliku `main.py`, zajmujący się uruchomieniem całej symulacji i wizualizujący rozgrywkę z pomocą biblioteki `pygame`.
+Wszystko 'spina' w całość kod zawarty w pliku `main.py`, zajmujący się uruchomieniem całej symulacji i wizualizujący rozgrywkę z pomocą biblioteki `pygame`.
 
 ### Opis interakcji między poszczególnymi komponentami:
 W pierwszej kolejności do `MARS`a przekazywana jest zawartość wczytanych plików z kodem wojowników (`MARS.load_warriors()`). Każdy z nich przekazywany jest oddzielnie do `Parser`a (metoda `parse_warrior()`), który przetwarza je na listę instrukcji w oczekiwanym przez nas formacie (klasa `Instruction`).
